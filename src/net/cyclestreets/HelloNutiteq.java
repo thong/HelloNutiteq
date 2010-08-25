@@ -1,9 +1,6 @@
 package net.cyclestreets;
 
-import java.util.List;
-
 import net.cyclestreets.api.ApiClient;
-import net.cyclestreets.api.Photo;
 import android.app.Activity;
 import android.content.Context;
 import android.location.LocationManager;
@@ -15,10 +12,12 @@ import android.widget.ZoomControls;
 
 import com.nutiteq.BasicMapComponent;
 import com.nutiteq.android.MapView;
+import com.nutiteq.components.OnMapElement;
+import com.nutiteq.components.Place;
 import com.nutiteq.components.PlaceIcon;
-import com.nutiteq.components.WgsBoundingBox;
 import com.nutiteq.components.WgsPoint;
 import com.nutiteq.controls.AndroidKeysHandler;
+import com.nutiteq.listeners.OnMapElementListener;
 import com.nutiteq.location.LocationMarker;
 import com.nutiteq.location.LocationSource;
 import com.nutiteq.location.NutiteqLocationMarker;
@@ -27,7 +26,7 @@ import com.nutiteq.maps.CloudMade;
 import com.nutiteq.ui.ThreadDrivenPanning;
 import com.nutiteq.utils.Utils;
 
-public class HelloNutiteq extends Activity {
+public class HelloNutiteq extends Activity implements OnMapElementListener {
           private MapView mapView;
           private BasicMapComponent mapComponent;
           private ZoomControls zoomControls;
@@ -48,8 +47,14 @@ public class HelloNutiteq extends Activity {
     mapComponent.setMap(new CloudMade("13ed67dfecf44b5a8d9dc3ec49268ba0", "DEVICE_UID", 64, 1));
     mapComponent.setPanningStrategy(new ThreadDrivenPanning());
     mapComponent.setControlKeysHandler(new AndroidKeysHandler());
+    mapComponent.setOnMapElementListener(this);
     mapComponent.startMapping();
-    mapView = new CycleStreetsMapView(this, mapComponent);
+    mapView = new MapView(this, mapComponent);
+    
+	PlaceIcon icon = new PlaceIcon(Utils
+            .createImage("/res/drawable-mdpi/icon.png"));
+	mapComponent.addPlace(new Place(0, "foo", icon, CAMBRIDGE));
+
 
     // add map listener
 //    WrapperMapListener wml = new WrapperMapListener(mapView);
@@ -134,5 +139,20 @@ public class HelloNutiteq extends Activity {
 	      mapComponent.stopMapping();
 	      mapComponent = null;
 	    }
+	}
+  
+	@Override
+	public void elementClicked(OnMapElement arg0) {
+		Log.d(getClass().getSimpleName(), "elementClicked " + ((Place) arg0).getLabel());
+	}
+
+	@Override
+	public void elementEntered(OnMapElement arg0) {
+		// TODO: show tool tip
+	}
+
+	@Override
+	public void elementLeft(OnMapElement arg0) {
+		// TODO: hide tool tip
 	}
 }
